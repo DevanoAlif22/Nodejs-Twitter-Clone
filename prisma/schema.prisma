@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// 1 user bisa punya banyak kontak
+// dan 1 kontak bisa punya banyak address
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Pengguna {
+  id       Int    @id @default(autoincrement())
+  username String @db.VarChar(100) @unique
+  name String? @db.VarChar(100) @unique
+  password String @db.VarChar(100)
+  bio String? @db.MediumText
+  situs String? @db.VarChar(100)
+  lahir String? @db.VarChar(100)
+  bergabung String? @db.VarChar(100)
+  gambarlatar String? @db.VarChar(100)
+  gambarprofil String? @db.VarChar(100)
+  postingan Postingan[]
+  mengikuti Mengikuti[]
+  diikuti Diikuti[]
+  suka Suka[]
+  @@map("pengguna")
+}
+
+model Postingan {
+  id       Int    @id @default(autoincrement())
+  deskripsi String @db.Text()
+  gambar String? @db.VarChar(100)
+  tanggal String @db.VarChar(100)
+  pengguna_id Int
+  pengguna Pengguna @relation(fields: [pengguna_id], references: [id])
+  disukai Suka[]
+  @@map("postingan")
+}
+
+model Mengikuti {
+  id       Int    @id @default(autoincrement())
+  mengikuti String @db.VarChar(100)
+  pengguna_id Int
+  pengguna Pengguna @relation(fields: [pengguna_id], references: [id])
+  @@map("mengikuti")
+}
+model Diikuti {
+  id       Int    @id @default(autoincrement())
+  diikuti String @db.VarChar(100)
+  pengguna_id Int
+  pengguna Pengguna @relation(fields: [pengguna_id], references: [id])
+  @@map("diikuti")
+}
+model Suka {
+  pengguna_id Int
+  postingan_id Int
+  pengguna Pengguna @relation(fields: [pengguna_id], references: [id])
+  postingan Postingan @relation(fields: [postingan_id], references: [id])
+  // karena id nya ada dua
+  @@id([pengguna_id, postingan_id])
+  @@map("suka")
+}
